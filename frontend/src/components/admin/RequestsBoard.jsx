@@ -51,6 +51,18 @@ const RequestsBoard = () => {
       console.log(err);
     }
   };
+  const handleDecline= async(userId, bookId)=>{
+    try{
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/books/request/decline`,
+      {
+        userId:userId,
+        bookId:bookId,
+      });
+      console.log(response);
+    }catch(err){
+      console.log(err);
+    }
+  }
 
   const handleRequest = (action, value) => {
     if (action === "accept") {
@@ -59,7 +71,10 @@ const RequestsBoard = () => {
         handleAcceptance(value?.userId, value?.bookId);
       }
     } else {
-      console.log("Decline");
+      if (!isFound(value?.userId, value?.bookId)){
+        dispatch(declineReq([value]));
+        handleDecline(value?.userId, value?.bookId);
+      }
     }
   };
 
@@ -134,7 +149,9 @@ const RequestsBoard = () => {
                   </button>
                 </td>
                 <td className="p-3 text-center font-semibold border-[0.5px] border-r-slate-400 w-[100%] whitespace-nowrap ">
-                  <button className="w-[100px] bg-red-500 p-1 rounded-md shadow-md">
+                  <button 
+                  onClick={()=>handleRequest("decline", data)}
+                  className="w-[100px] bg-red-500 p-1 rounded-md shadow-md">
                     DECLINE
                   </button>
                 </td>

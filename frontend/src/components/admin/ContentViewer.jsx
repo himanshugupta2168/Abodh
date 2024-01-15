@@ -6,7 +6,7 @@ const ContentViewer = () => {
   const currContent = useSelector((state) => state.admin);
   return (
     <div className="w-[80%]  sm:w-[100%] sm:ml-[0%] ml-[20%] p-10 sm:p-0 bg-slate-400 flex justify-center items-start pt-36 sm:pt-32">
-      {AdminComps?.map((comp) => {
+      {AdminComps?.map((comp, ind) => {
         if (currContent?.content === comp?.name) {
           return comp?.comp;
         }
