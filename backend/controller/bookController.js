@@ -99,7 +99,7 @@ exports.bookRoute = async (req, res, next) => {
       next(err);
     }
   };
-  
+
   exports.moveToRentedRoute = async (req, res, next) => {
     try {
       const getReqBook = await Request.findOne({
@@ -154,6 +154,22 @@ exports.bookRoute = async (req, res, next) => {
       next(err);
     }
   };
+
+  exports.declineBook=async(req, res, next)=>{
+    try{
+      const {userId , bookId}= req.body;
+      const resp= await Request.findOneAndDelete({
+        bookId:bookId,
+      });
+      res.status(200).json({
+        message:"Book Request Declined",
+      })
+
+    }
+    catch(err){
+        next(err)
+    }
+  }
   
   exports.getAllRentalsRoute = async (req, res, next) => {
     try {
@@ -179,3 +195,36 @@ exports.bookRoute = async (req, res, next) => {
     }
   };
   
+  exports.deleteBook = async(req, res, next)=>{
+    try{
+      const{bookId}= req.body;
+      console.log(bookId);
+      const book = await Books.findOneAndDelete({
+        _id:bookId,
+      })
+      return res.status(200).json({
+        message:"Book deleted Successfully",
+      })
+    }
+    catch(err){
+      next(err);
+    }
+  }
+  exports.updatePrice = async (req, res, next) => {
+    try {
+      const { bookId, price } = req.body;
+      const book = await Books.findByIdAndUpdate(
+        bookId, // Specify the id directly, not in an object
+        { price: price },
+        { new: true } // This ensures that the updated document is returned
+      );
+  
+      if (!book) {
+        return res.status(404).json({ message: "Book not found" });
+      }
+  
+      res.status(200).json({ message: "Amount updated successfully" });
+    } catch (err) {
+      next(err);
+    }
+  };  

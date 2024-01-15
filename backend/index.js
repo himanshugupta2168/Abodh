@@ -17,6 +17,9 @@ const {
   requestedBooksRoute,
   requestRoute,
   returnedStatChange,
+  declineBook,
+  deleteBook,
+  updatePrice
 } = require( "./controller/bookController.js");
 
 
@@ -62,6 +65,7 @@ app.get("/books/", booksRoute);
 // Get a specific book by ID
 app.get("/books/:id", bookRoute);
 
+
 // Get all books of a specific type/category
 app.get("/books/all/:type", categoryRoute);
 
@@ -70,6 +74,7 @@ app.post("/books/create", createBook);
 
 // Request a book from admin
 app.post("/books/request", requestRoute);
+app.post("/books/request/decline",declineBook )
 
 // Get all requested books
 app.get("/books/request/all", requestedBooksRoute);
@@ -82,6 +87,11 @@ app.post("/books/request/one", moveToRentedRoute);
 
 // Update the status when a book is returned
 app.put("/books/returned/update", returnedStatChange);
+// to del'ete a book 
+app.post("/books/delete",deleteBook)
+//  to update the price 
+app.patch("/books/update", updatePrice)
+
 
 
 
