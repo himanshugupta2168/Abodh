@@ -1,6 +1,6 @@
-import express from "express";
+const express = require("express");
 const router = express.Router();
-import {
+const {
   bookRoute,
   booksRoute,
   categoryRoute,
@@ -10,16 +10,33 @@ import {
   requestedBooksRoute,
   requestRoute,
   returnedStatChange,
-} from "../controller/bookController.js";
+} = require( "../controller/bookController.js");
 
-router.get("/", booksRoute); // get all books.
+// Get all books
+router.get("/", booksRoute);
+
+// Get a specific book by ID
 router.get("/:id", bookRoute);
-router.get("/all/:type", categoryRoute);
-router.post("/create", createBook); // create a book.
-router.post("/request", requestRoute); // request a book to admin.
-router.get("/request/all", requestedBooksRoute); // get all the requested Books.
-router.get("/rentals/all", getAllRentalsRoute); //Get all the rented (curr) books.
-router.post("/request/one", moveToRentedRoute); //get one particular book => move to rented book => delete it from requested
-router.put("/returned/update", returnedStatChange); // book returned from user and updated!
 
-export default router;
+// Get all books of a specific type/category
+router.get("/all/:type", categoryRoute);
+
+// Create a new book
+router.post("/create", createBook);
+
+// Request a book from admin
+router.post("/request", requestRoute);
+
+// Get all requested books
+router.get("/request/all", requestedBooksRoute);
+
+// Get all rented books
+router.get("/rentals/all", getAllRentalsRoute);
+
+// Move a requested book to rented status
+router.post("/request/one", moveToRentedRoute);
+
+// Update the status when a book is returned
+router.put("/returned/update", returnedStatChange);
+
+module.exports = router;

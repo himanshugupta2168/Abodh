@@ -1,27 +1,30 @@
-import User from "../model/userModel.js";
-import bcrypt from "bcrypt";
+const User = require("../model/userModel.js");
+const bcrypt = require("bcrypt");
 
-export const registerRoute = async (req, res, next) => {
+// Route to register a new user
+exports.registerRoute = async (req, res, next) => {
   const admins = ["admin@123.com"];
   const saltRounds = 10;
   const hashedPass = bcrypt.hashSync(req.body.password, saltRounds);
 
   try {
     const checkUserAvail = await User.findOne({ email: req.body.email });
+
     if (checkUserAvail) {
       return next({
         status: 401,
-        message: "User Already found!",
+        message: "User already found!",
       });
     } else {
       const newUser = new User({
         ...req.body,
         password: hashedPass,
-        isAdmin: admins.includes(req.body.email) ? true : false,
+        isAdmin: admins.includes(req.body.email),
         membership: false,
       });
 
       const saveUser = await newUser.save();
+
       res.status(200).json({
         id: saveUser?._id,
         username: saveUser?.username,
@@ -39,17 +42,20 @@ export const registerRoute = async (req, res, next) => {
   }
 };
 
-export const loginRoute = async (req, res, next) => {
+// Route to log in a user
+exports.loginRoute = async (req, res, next) => {
   try {
     const checkUserAvail = await User.findOne({ email: req.body.email });
+
     if (checkUserAvail) {
       const checkPass = await bcrypt.compare(
         req.body.password,
         checkUserAvail.password
       );
+
       if (!checkPass) {
         return next({
-          status: 404,
+          status: 401,
           message: "Incorrect username and password!",
         });
       } else {
@@ -67,7 +73,7 @@ export const loginRoute = async (req, res, next) => {
       }
     } else {
       return next({
-        status: 401,
+        status: 404,
         message: "User not found!",
       });
     }
@@ -76,9 +82,11 @@ export const loginRoute = async (req, res, next) => {
   }
 };
 
-export const getUser = async (req, res, next) => {
+// Route to get a specific user by ID
+exports.getUser = async (req, res, next) => {
   try {
     const user = await User.findById({ _id: req.params.id });
+
     res.status(200).json({
       favourite: user?.favourites,
       membership: user?.membership,
@@ -91,7 +99,8 @@ export const getUser = async (req, res, next) => {
   }
 };
 
-export const getUsers = async (req, res, next) => {
+// Route to get all non-admin users
+exports.getUsers = async (req, res, next) => {
   try {
     const users = await User.find(
       { isAdmin: false },
@@ -99,35 +108,39 @@ export const getUsers = async (req, res, next) => {
         password: 0,
       }
     );
+
     res.status(200).json(users);
   } catch (err) {
     next(err);
   }
 };
 
-export const updateUser = async (req, res, next) => {
+// Route to update a user
+exports.updateUser = async (req, res, next) => {
   try {
     await User.findByIdAndUpdate({ _id: req.body.id }, req.body);
+
     res.status(200).json({
-      message: "User updated sucessfully!",
+      message: "User updated successfully!",
     });
   } catch (err) {
     next(err);
   }
 };
 
-export const deleteUser = async (req, res, next) => {
+// Route to delete a user by ID
+exports.deleteUser = async (req, res, next) => {
   try {
     const delUser = await User.findById({ _id: req.params.id });
 
     if (delUser) {
-      console.log(delUser);
       await User.findByIdAndDelete({ _id: delUser._id });
+
       res.status(200).json({
         message: "User deleted successfully!",
       });
     } else {
-      res.status(401).json({
+      res.status(404).json({
         message: "User not found!",
       });
     }
@@ -136,7 +149,8 @@ export const deleteUser = async (req, res, next) => {
   }
 };
 
-export const addFavourites = async (req, res, next) => {
+// Route to add a book to user's favorites
+exports.addFavourites = async (req, res, next) => {
   try {
     const checkAlreadyInFav = await User.find({
       $and: [
@@ -150,12 +164,13 @@ export const addFavourites = async (req, res, next) => {
         { _id: req.body.userId },
         { $push: { favourites: req.body.bookId } }
       );
+
       res.status(200).json({
-        message: "Book added to your Fav!",
+        message: "Book added to your favorites!",
       });
     } else {
       res.status(403).json({
-        message: "Already found in your Fav!",
+        message: "Already found in your favorites!",
       });
     }
   } catch (err) {
@@ -163,35 +178,41 @@ export const addFavourites = async (req, res, next) => {
   }
 };
 
-export const getFavourites = async (req, res, next) => {
+// Route to get a user's favorite books
+exports.getFavourites = async (req, res, next) => {
   try {
     const userFavs = await User.find({ _id: req.params.id }, { favourites: 1 });
+
     res.status(200).json(userFavs[0]?.favourites);
   } catch (err) {
     next(err);
   }
 };
 
-export const deleteFavourites = async (req, res, next) => {
+// Route to remove a book from user's favorites
+exports.deleteFavourites = async (req, res, next) => {
   try {
     await User.findByIdAndUpdate(
       { _id: req.body.userId },
       { $pull: { favourites: req.body.bookId } }
     );
+
     res.status(200).json({
-      message: "Book removed from FAV!",
+      message: "Book removed from favorites!",
     });
   } catch (err) {
     next(err);
   }
 };
 
-export const getBookInHand = async (req, res, next) => {
+// Route to get information about books in hand, rented history, and requested books for a user
+exports.getBookInHand = async (req, res, next) => {
   try {
     const extraInfo = await User.findById(
       { _id: req.params.id },
       { bookInHand: 1, requestedBooks: 1, rentedHistory: 1 }
     );
+
     res.status(200).json({
       bookInHand: extraInfo?.bookInHand,
       rentedHistory: extraInfo?.rentedHistory,
