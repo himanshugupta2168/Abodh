@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <div className="fixed top-0 z-30 right-0 left-0 w-[100%] h-[50px] flex justify-between items-center pl-10 sm:pl-5 sm:pr-8 pr-20 py-10 md:py-7 border-b-[1px] border-b-slate-500 shadow-xl bg-slate-800">
       <p className="font-extrabold text-4xl md:text-3xl text-white sm:text-lg">
-        UpTime <span className="text-lg text-slate-300">( Dashboard )</span>
+        Abodh <span className="text-lg text-slate-300">( Dashboard )</span>
       </p>
 
       <div

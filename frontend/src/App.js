@@ -29,7 +29,7 @@ const App = () => {
       dispatch(setY());
     }
     getBooks();
-    document.title = "Uptime Library";
+    document.title = "Abodh";
   }, []);
 
   return (
